@@ -1,1 +1,25 @@
-Hello World
+<!-- First Part, Render the grid and other useful stuff . This is the play ground  -->
+<div>
+  <div>
+    <div>
+      <h2>{{title}}</h2>
+    </div>
+    <div>
+      Player 1
+    </div>
+    <div>
+      Player 2
+    </div>
+  </div>
+
+  <div>
+    <table id = "game">
+      <tr *ngFor = "let iterationNumber of gameGrid">
+        <td *ngFor = "let numberOf iterationNumber" id="grid-{{number}}" >
+          {{renderPlayedText(number)}}
+        </td>
+      </tr>
+    </table>
+    <h6> This is Room Number {{roomNumber}}.</h6>
+  </div>
+</div>
