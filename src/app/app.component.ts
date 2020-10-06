@@ -1,5 +1,6 @@
 import { Component, ViewChild, OnInit } from '@angular/core';
 import { AppService } from './app.service';
+import { NgbModalOptions, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-root',
@@ -9,19 +10,29 @@ import { AppService } from './app.service';
 })
 export class AppComponent implements OnInit{
   title = 'tic-tac-toe-angular';
-  roomNumber = <Number> 0;
-  playedText = <string>'';
   gameGrid = <Array<Object>>[];
   playedGameGrid = <Array<Object>>[];
   displayPlayerTurn = <Boolean> true;
 
+  //Bootstrap modal Options 
+  @ViewChild('content') private content;
+  private modalOption: NgbModalOptions = {};
+
+  //Socket related varaibles
+  totalRooms = <Number> 0;
+  emptyRooms = <Array<number>> [];
+  roomNumber = <Number> 0;
+  playedText = <string>'';
+
   constructor(
     private appService: AppService,
+    private roomSelectionService: NgbModal,
   ){
     this.gameGrid = appService.gameGrid;
   }
 
   ngOnInit(){
+    const roomSelectionBox = this.roomSelectionService.open(this.content, this.modalOption)
     
   }
 
