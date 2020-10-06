@@ -33,8 +33,28 @@
     <div>
       <span>Total Rooms Available: {{totalRooms}}</span>
     </div>
-    <div>
-      
-    </div>
+    <div class="modal-body">
+    	<div class="container">
+        <div  [hidden]="roomNumber > 0 ? true :false">
+          <div >
+            <h6 class="text-center">Available Rooms to Join</h6>
+          </div>
+          <div class="text-center">
+            <h5>
+              <span>OR</span>
+            </h5>
+            <button class="btn btn-primary" (click)="createRoom()"> Create New Room</button>
+          </div>
+        </div>
+			<br>
+        <div [hidden]="roomNumber > 0 ? false :true">
+          <h2 class="text-center">Waiting for player to join</h2>
+          <br/>
+          <br/>
+          <br/>
+          <h6 class="text-center">You are in Room Number {{roomNumber}}, Tell your friend to join Room Number {{roomNumber}}</h6>
+        </div>
+		  </div>
+  	</div>
   </ng-template>
 </div>
