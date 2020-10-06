@@ -1,60 +1,70 @@
-<!-- First Part, Render the grid and other useful stuff . This is the play ground  -->
+<!-- Play Start -->
 <div class="container">
-  <div class="row heading-row">
-    <div >
-      <h2>{{title}} multiplayer game</h2>
-    </div>
-    <div [class.current-player]="displayPlayerTurn">
-      Player 1
-    </div>
-    <br/>
-    <div [class.current-player]="!displayPlayerTurn">
-      Player 2
-    </div>
-  </div>
-
-  <div class = "row">
-    <div class = "text-center">
-      <table id = "game" class="game-grid">
-        <tr *ngFor = "let iterationNumber of gameGrid">
-          <td *ngFor = "let number of iterationNumber"
-              class="grid-{{number}}"
-              id="grid{{number}}" (click)=null>
-                x
-          </td>
-        </tr>
-      </table>
-    </div>
-    <h6> This is Room Number {{roomNumber}}.</h6>
-  </div>
-
-  <!-- Second Part, Create and select Rooms -->
-  <ng-template #content>
-    <div>
-      <span>Total Rooms Available: {{totalRooms}}</span>
-    </div>
-    <div class="modal-body">
-    	<div class="container">
-        <div  [hidden]="roomNumber > 0 ? true :false">
-          <div >
-            <h6 class="text-center">Available Rooms to Join</h6>
-          </div>
-          <div class="text-center">
-            <h5>
-              <span>OR</span>
-            </h5>
-            <button class="btn btn-primary" (click)="createRoom()"> Create New Room</button>
-          </div>
-        </div>
-			<br>
-        <div [hidden]="roomNumber > 0 ? false :true">
-          <h2 class="text-center">Waiting for player to join</h2>
-          <br/>
-          <br/>
-          <br/>
-          <h6 class="text-center">You are in Room Number {{roomNumber}}, Tell your friend to join Room Number {{roomNumber}}</h6>
-        </div>
-		  </div>
-  	</div>
-  </ng-template>
+	<div class="row heading-row">
+		<div class="col-md-12 text-center">
+			<h2>{{title}}</h2>
+		</div>
+		<div class="col-md-6 text-center">
+			<div class="player-heading" [class.current-player]="displayPlayerTurn">
+				Player 1
+			</div>
+		</div>
+		<div class="col-md-6 text-center">
+			<div class="player-heading"  [class.current-player]="!displayPlayerTurn">
+				Player 2
+			</div>
+		</div>
+	</div>	
+	<h6 class="text-center">Room Number {{roomNumber}}.</h6>
+	<div class="row">
+		<div class="text-center game-container">
+			<table id="game" class="game-grid" #game>
+				<tr *ngFor="let iterationNumber of gameGrid">
+					<td *ngFor="let number of iterationNumber"
+ 						class="grid-solid"
+						id="grid{{number}}" (click)="play(number)">
+							{{ renderPlayedText(number)}}
+					</td>
+				</tr>
+			</table>
+			<br/>
+			<h6 class="text-center">Total Games Played: {{totalGamesPlayed}}.</h6>
+			<br/>
+			<h6 class="text-center">Player 1 (X) Wons: {{numbersOfPlayer1Won}}.</h6>
+			<h6 class="text-center">Player 2 (O) Wons: {{numbersOfPlayer2Won}}.</h6>
+			<h6 class="text-center">Tie Games {{numbersOfTieGame}}.</h6>
+		</div>
+	</div>
 </div>
+
+
+
+<!-- Modal to create and select Rooms-->
+<ng-template #content>
+  	<div class="modal-body">
+    	<div class="container">
+			<div class="join-game" [hidden]="roomNumber > 0 ? true :false">
+				<div class="room-list">
+					<h6 class="text-center">Available Rooms to Join</h6>
+					<ul class="nav nav-pills">
+						<li class="nav-item room-number" *ngFor="let number of emptyRooms">
+							<a class="nav-link active" title="Join room Number {{number}}" (click)="joinRoom(number)">#{{number}}</a>
+						</li>
+					</ul>
+				</div>
+				<div class="create-room text-center">
+					<h5>
+						<span>OR</span>
+					</h5>
+					<button class="btn btn-primary" (click)="createRoom()"> Create New Room</button>
+				</div>
+			</div>
+			<br>
+			<div class="player-waitng" [hidden]="roomNumber > 0 ? false :true">
+				<h2 class="text-center">Waiting for player to join</h2>
+				<br/>
+				<h6 class="text-center">You are in Room Number {{roomNumber}}</h6>
+			</div>
+		</div>
+  	</div>
+</ng-template>

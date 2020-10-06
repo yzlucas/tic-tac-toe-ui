@@ -1,0 +1,93 @@
+body {
+    background-color: lightblue;
+}
+h5 {
+    font: 33px sans-serif;
+    margin-top: 30px;
+    position: relative;
+    text-align: center;
+    text-transform: uppercase;
+    z-index: 1;
+    color: red;
+    margin-bottom: 20px;
+}
+h5  span {
+    background: white;
+    padding: 0 15px;
+}
+
+.room-list{
+    margin-bottom: 20px;
+    margin-top: 10px;
+}
+
+.room-number {
+    margin-right: 5px;
+}
+
+.room-number a:hover{
+    color: white;
+    cursor: pointer;
+}
+
+.game-loader{
+    margin-left: 40%;
+}
+
+.app-heading {
+    padding: 5px;
+    border-bottom: solid 0.5px grey;
+  }
+  
+  .player-heading{
+    border-bottom: 2px solid grey;
+    padding: 20px;
+    width: 10%;
+    margin: auto;
+  }
+  
+  .current-player{
+    border-bottom: 5px solid red;
+  }
+  
+  .heading-row{
+    margin-bottom: 60px;
+  }
+  
+  .app-players {
+    padding: 15px;
+  }
+  
+  .game-container {
+    width: 60%;
+    margin: auto;
+  }
+  
+  .game-grid{
+    height:50%;
+    width: 90%;
+  }
+  
+  .game-grid tr {
+    overflow: hidden;
+  }
+  
+  .game-grid td {
+    cursor: pointer;
+    overflow: hidden;
+    height:100px;
+    width:100px;
+    font-size: 43px;
+    font-weight: 600;
+    color: #616161;
+  }
+  .grid-solid {
+    border-top:solid 5px grey;
+    border-left:solid 5px grey;
+    border-right:solid 5px grey;
+    border-bottom:solid 5px grey;
+  }
+
+
+
+

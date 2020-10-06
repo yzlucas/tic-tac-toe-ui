@@ -1,75 +1,89 @@
-import { Component, ViewChild, OnInit } from '@angular/core';
+import { Component, Renderer, ViewChild , OnInit } from '@angular/core';
 import { AppService } from './app.service';
-import { NgbModalOptions, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css'],
-  providers: [AppService]
+	selector: 'app-root',
+	templateUrl: './app.component.html',
+	styleUrls: ['./app.component.css'],
+	providers: [AppService]
 })
-export class AppComponent implements OnInit{
-  title = 'tic-tac-toe-angular';
-  gameGrid = <Array<Object>>[];
-  playedGameGrid = <Array<Object>>[];
-  displayPlayerTurn = <Boolean> true;
-  myTurn = <Boolean>true;
-  whoWillStart = <Boolean>true;
-  movesPlayed = <number>0;
+export class AppComponent implements OnInit {
+
+	private title = "Tic-Tac-Toe-Multiplayer-Game";
+	private gameGrid = <Array<Object>>[];
+	private playedGameGrid = <Array<Object>>[];
+	private movesPlayed = <number>0;
+	private displayPlayerTurn = <Boolean>true;
+	private myTurn = <Boolean>true;
+	private whoWillStart = <Boolean>true;
+	@ViewChild('content') private content;
+	private modalOption: NgbModalOptions = {};
+	private totalRooms = <Number> 0;
+	private emptyRooms = <Array<number>> [];
+	private roomNumber = <Number> 0;
+	private playedText = <string>'';
+	private whoseTurn = 'X';
+	private numbersOfPlayer1Won = <number>0;
+	private numbersOfPlayer2Won = <number>0;
+	private numbersOfTieGame= <number>0;
+	private totalGamesPlayed= <number>0;
+
+	constructor(
+		private _renderer: Renderer,
+		private modalService: NgbModal,
+		private appService: AppService,
+	) {
+		this.gameGrid = appService.gameGrid;
+	}
+
+	ngOnInit() {
+		//Code to display the Modal
+		this.modalOption.backdrop = 'static';
+		this.modalOption.keyboard = false;
+		this.modalOption.size = 'lg';
+		const localModalRef = this.modalService.open(this.content, this.modalOption);
 
 
-  //Bootstrap modal Options 
-  @ViewChild('content') private content;
-  private modalOption: NgbModalOptions = {};
+		// connect the player to the socket
+		this.appService.connectSocket();
 
-  //Socket related varaibles
-  totalRooms = <Number> 0;
-  emptyRooms = <Array<number>> [];
-  roomNumber = <Number> 0;
-  playedText = <string>'';
-  whoseTurn = 'X';
-
-  constructor(
-    private appService: AppService,
-    private roomSelectionService: NgbModal,
-  ){
-    this.gameGrid = appService.gameGrid;
-  }
-
-  ngOnInit(){
-    const roomSelectionBox = this.roomSelectionService.open(this.content, this.modalOption)
-    this.appService.connectSocket();
-    		// HTTP call to get Empty rooms and total room numbers
 		this.appService.getRoomStats().then(response => {
 			this.totalRooms = response['totalRoomCount'];
 			this.emptyRooms = response['emptyRooms'];
-    });
+		});
 
-		// Socket evenet will total available rooms to play.
 		this.appService.getRoomsAvailable().subscribe(response => {
 			this.totalRooms = response['totalRoomCount'];
 			this.emptyRooms = response['emptyRooms'];
 		});
 
-		// Socket evenet to start a new Game
 		this.appService.startGame().subscribe((response) => {
-			roomSelectionBox.close();
+			localModalRef.close();
 			this.roomNumber = response['roomNumber'];
 		});
 
-		// Socket event will receive the Opponent player's Move
 		this.appService.receivePlayerMove().subscribe((response) => {
 			this.opponentMove(response);
 		});
 
-		// Socket event to check if any player left the room, if yes then reload the page.
 		this.appService.playerLeft().subscribe((response) => {
 			alert('Player Left');
 			window.location.reload();
 		});
-  }
+	}
 
-  createRoom() {
+
+	//Method to join the new Room by passing Romm Number
+	joinRoom(roomNumber) {
+		this.myTurn = false;
+		this.whoWillStart = false;
+		this.whoseTurn = 'O';
+		this.appService.joinNewRoom(roomNumber);
+	}
+
+	//Method create new room
+	createRoom() {
 		this.myTurn = true;
 		this.whoseTurn = 'X';
 		this.whoWillStart = true;
@@ -78,16 +92,7 @@ export class AppComponent implements OnInit{
 		});
 	}
 
-  renderPlayedText(number) {
-		if (this.playedGameGrid[number] === undefined) {
-			return '';
-		}else {
-			this.playedText = this.playedGameGrid[number]['player'];
-			return "this.playedText;"
-		}
-  }
-  
-  opponentMove(params) {
+	opponentMove(params) {
 		this.displayPlayerTurn = !this.displayPlayerTurn ? true : false;
 		if (params['winner'] ===  null) {
 			this.playedGameGrid[params['position']] = {
@@ -95,18 +100,54 @@ export class AppComponent implements OnInit{
 				player: params['playedText']
 			};
 			this.myTurn = true;
-		}
-		else if(params['winner'] === 'Game Draw'){
+		}else {
+			if(params['winner'].charAt(0) == 'X'){
+				this.numbersOfPlayer1Won++;
+			}
+			else if(params['winner'].charAt(0) == 'O'){
+				this.numbersOfPlayer2Won++;
+			}
+			else if(params['winner'].charAt(0) == 'T'){
+				this.numbersOfTieGame++;
+			}
+			this.totalGamesPlayed = this.numbersOfPlayer1Won + this.numbersOfPlayer2Won + this.numbersOfTieGame;
 			alert(params['winner']);
 			this.resetGame();
 		}
-		else {
-			alert(params['winner']);
-			this.resetGame();
+	}
+
+
+	//This method will be called when the current user tries to play his/her move
+	play(number) {
+		if (!this.myTurn) {
+			return;
 		}
-  }
-  
-  resetGame() {
+		this.movesPlayed += 1;
+		this.playedGameGrid[number] = {
+			position: number,
+			player: this.whoseTurn
+		};
+		this.appService.sendPlayerMove({
+			'roomNumber' : this.roomNumber,
+			'playedText': this.whoseTurn,
+			'position' : number,
+			'playedGameGrid': this.playedGameGrid,
+			'movesPlayed' : this.movesPlayed
+		});
+		this.myTurn = false;
+		this.displayPlayerTurn = !this.displayPlayerTurn ? true : false;
+	}
+
+	renderPlayedText(number) {
+		if (this.playedGameGrid[number] === undefined) {
+			return '';
+		}else {
+			this.playedText = this.playedGameGrid[number]['player'];
+			return this.playedText;
+		}
+	}
+
+	resetGame() {
 		this.playedGameGrid = [];
 		this.gameGrid = [];
 		this.gameGrid = this.appService.gameGrid;
