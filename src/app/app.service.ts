@@ -15,7 +15,7 @@ export class AppService {
 	// Const and variable for Tic Tac Toe Game
 	public gameGrid = <Array<Object>>[[1, 2, 3], [4, 5, 6], [7, 8, 9]];
 
-	private BASE_URL = 'http://localhost:4000';
+	private BASE_URL = 'http://3.133.86.4:80';
 	public socket;
 	private headerOptions = new RequestOptions({
 		headers: new Headers({ 'Content-Type': 'application/json;charset=UTF-8' })
@@ -26,7 +26,7 @@ export class AppService {
 	//This method will call the HTTP request to get the Total room count and Available rooms to play
 	public getRoomStats() {
 		return new Promise(resolve => {
-			this.http.get(`http://localhost:4000/getRoomStats`).subscribe(data => {
+			this.http.get('http://3.133.86.4:80/getRoomStats').subscribe(data => {
 				resolve(data);
 			});
 		});
